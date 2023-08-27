@@ -3,14 +3,15 @@
 
 # In[1]:
 
-
+# pip install scikit-learn
+# !pip install tensorflow
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
-
 
 # In[2]:
 
@@ -73,12 +74,18 @@ embedding_dim = 100  # you may need to change this according to your task 100 is
 max_length = max(len(seq) for seq in x)
 trunc_type= 'post'
 
+# In[164]:
+
+# Specify GPU device
+physical_devices = tf.config.experimental.list_physical_devices('GPU')
+if len(physical_devices) > 0:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 # In[32]:
 
 
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 
 # In[33]:
@@ -132,7 +139,7 @@ model_rnn.summary()
 
 model_rnn.compile(loss='binary_crossentropy',
               optimizer='adam',
-              metrics=['f1_score'])
+              metrics=['accuracy'])
 
 
 # In[167]:
@@ -162,113 +169,11 @@ print(hist_df.describe())
 ### parameters to plot Loss curve
 ###------------------
 
-params = {'legend.fontsize' : 'large',
-          'figure.figsize'  : (12,9),
-          'axes.labelsize'  : 'x-large',
-          'axes.titlesize'  :'x-large',
-          'xtick.labelsize' :'large',
-          'ytick.labelsize' :'large',
-         }
-CMAP = plt.cm.coolwarm
-
-plt.rcParams.update(params)
-
-###-----------------------------------
-### Function to plot Loss Curve
-###-----------------------------------
-
-def plot_tf_hist(hist_df):
-    '''
-    Args:
-      hist_df : pandas Dataframe with four columns
-                For 'x' values, we will use index
-    '''
-    fig, axes = plt.subplots(1,2 , figsize = (15,6))
-
-    # properties  matplotlib.patch.Patch 
-    props = dict(boxstyle='round', facecolor='aqua', alpha=0.4)
-    facecolor = 'cyan'
-    fontsize=12
-    
-    # Get columns by index to eliminate any column naming error
-    y1 = hist_df.columns[0]
-    y2 = hist_df.columns[1]
-    y3 = hist_df.columns[2]
-    y4 = hist_df.columns[3]
-
-    # Where was min loss
-    best = hist_df[hist_df[y3] == hist_df[y3].min()]
-    
-    ax = axes[0]
-
-    hist_df.plot(y = [y1,y3], ax = ax, colormap=CMAP)
-
-
-    # little beautification
-    txtFmt = "{}: \n  train: {:6.4f}\n   test: {:6.4f}"
-    txtstr = txtFmt.format(y1.capitalize(),
-                           hist_df.iloc[-1][y1],
-                           hist_df.iloc[-1][y3]) #text to plot
-    
-    # place a text box in upper middle in axes coords
-    ax.text(0.3, 0.95, txtstr, transform=ax.transAxes, fontsize=fontsize,
-            verticalalignment='top', bbox=props)
-
-    # Mark arrow at lowest
-    ax.annotate(f'Min: {best[y3].to_numpy()[0]:6.4f}', # text to print
-                xy=(best.index.to_numpy(), best[y3].to_numpy()[0]), # Arrow start
-                xytext=(best.index.to_numpy()-1, best[y3].to_numpy()[0]), # location of text 
-                fontsize=fontsize, va='bottom', ha='right',bbox=props, # beautification of text
-                arrowprops=dict(facecolor=facecolor, shrink=0.05)) # arrow
-
-    # Draw vertical line at best value
-    ax.axvline(x = best.index.to_numpy(), color = 'green', linestyle='-.', lw = 3);
-
-    ax.set_xlabel("Epochs")
-    ax.set_ylabel(y1.capitalize())
-    ax.set_title('Errors')
-    ax.grid();
-    ax.legend(loc = 'upper right') # model legend to upper left
-
-    ax = axes[1]
-
-    hist_df.plot( y = [y2, y4], ax = ax, colormap=CMAP)
-    
-    # little beautification
-    txtFmt = "{}: \n  train: {:6.4f}\n  test:  {:6.4f}"
-    txtstr = txtFmt.format(y2.capitalize(),
-                           hist_df.iloc[-1][y2],
-                           hist_df.iloc[-1][y4]) #text to plot
-
-    # place a text box in upper middle in axes coords
-    ax.text(0.3, 0.2, txtstr, transform=ax.transAxes, fontsize=fontsize,
-            verticalalignment='top', bbox=props)
-
-    # Mark arrow at lowest
-    ax.annotate(f'Best: {best[y4].to_numpy()[0]:6.4f}', # text to print
-                xy=(best.index.to_numpy(), best[y4].to_numpy()[0]), # Arrow start
-                xytext=(best.index.to_numpy()-1, best[y4].to_numpy()[0]), # location of text 
-                fontsize=fontsize, va='bottom', ha='right',bbox=props, # beautification of text
-                arrowprops=dict(facecolor=facecolor, shrink=0.05)) # arrow
-    
-    
-    # Draw vertical line at best value
-    ax.axvline(x = best.index.to_numpy(), color = 'green', linestyle='-.', lw = 3);
-
-    ax.set_xlabel("Epochs")
-    ax.set_ylabel(y2.capitalize())
-    ax.grid()
-    ax.legend(loc = 'lower right')
-    
-    plt.tight_layout()
-
-
 # In[48]:
 
 
-plot_tf_hist(hist_df)
-
-
+model_rnn.save("my_rnn_model.h5")
+hist_df.to_csv("rnn_loss_df.csv")
 # In[ ]:
 
 
