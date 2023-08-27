@@ -1,0 +1,11 @@
+[nltk_data] Error loading punkt: <urlopen error [Errno 101] Network is
+[nltk_data]     unreachable>
+Is CUDA available:  True
+CUDA version:  10.0.130
+Current Device ID:  0
+Name of the CUDA device:  Tesla V100-PCIE-16GB
+Using cuda device
+Traceback (most recent call last):
+  File "DNN_sRNN_pytorch_code_01.py", line 184, in <module>
+    get_ipython().system('pip install torchsummary')
+NameError: name 'get_ipython' is not defined
