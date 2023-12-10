@@ -7,13 +7,6 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.preprocessing import LabelEncoder
 
-# Initialize NLTK resources
-# nltk.download('punkt')
-
-# Assuming you have already trained your model and loaded necessary variables like tfidf, mnb, and lbl
-
-# Sample data for demonstration
-
 # Routes
 #@app.route('/')
 def welcome():
@@ -28,14 +21,12 @@ def hindi_tokenizer(text):
     # remove punctuation from each word
     words = [re_punc.sub('', w) for w in tokens]
     return words
-
-# Assuming these are global variables
+# global variables
 tfidf = TfidfVectorizer(tokenizer=hindi_tokenizer)
 svm = SVC()
 lbl = LabelEncoder()
 
-# You should replace this with your actual training data and model loading code
-# Example:
+# Replacing this with your actual training data and model loading code
 with open('tfidf_vectorizer1.pkl', 'rb') as file:
     tfidf = pickle.load(file)
 with open('model1.pkl', 'rb') as file:
@@ -87,6 +78,6 @@ def main():
         else:
             st.markdown(ham_html, unsafe_allow_html=True)
 
-# Assuming this block is to run the Streamlit app
+# The block to run the Streamlit app
 if __name__ == '__main__':
     main()
